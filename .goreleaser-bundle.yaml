@@ -6,32 +6,6 @@ project_name: test-hybrid-release
 builds:
   - skip: true
 
-# Le bundle TPM comme artifact
-archives:
-  - id: bundle
-    format: binary
-    builds: []
-    files:
-      - tpm-ca-certificates.pem
-    name_template: "tpm-ca-certificates"
-
-# Checksum de l'artifact
-checksum:
-  name_template: "checksums.txt"
-  algorithm: sha256
-
-# Signature Cosign v3 keyless
-signs:
-  - id: cosign-checksum
-    cmd: cosign
-    signature: "${artifact}.sigstore.json"
-    args:
-      - "sign-blob"
-      - "--bundle=${signature}"
-      - "${artifact}"
-      - "--yes"
-    artifacts: checksum
-
 # Configuration de la release GitHub
 release:
   github:
@@ -40,6 +14,10 @@ release:
   draft: false
   prerelease: false
   mode: append
+  extra_files:
+    - glob: ./tpm-ca-certificates.pem
+    - glob: ./checksums.txt
+    - glob: ./checksums.txt.sigstore.json
   header: |
     ## TPM Trust Bundle {{ .Tag }}
 

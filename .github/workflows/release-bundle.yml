@@ -35,9 +35,20 @@ jobs:
           # Vérifier que le bundle a été généré
           test -f tpm-ca-certificates.pem || exit 1
 
+          # Générer le checksum
+          sha256sum tpm-ca-certificates.pem > checksums.txt
+
           # Afficher des stats pour les logs
           echo "Bundle size: $(wc -c < tpm-ca-certificates.pem) bytes"
           ls -lh tpm-ca-certificates.pem
+          cat checksums.txt
+
+      - name: Sign checksums with Cosign
+        run: |
+          cosign sign-blob \
+            --bundle=checksums.txt.sigstore.json \
+            --yes \
+            checksums.txt
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
