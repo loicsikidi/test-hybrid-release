@@ -53,7 +53,7 @@ signs:
 # Configuration ko pour OCI images
 kos:
   - id: awesomecli
-    build: awesomecli
+    main: ./cmd
     base_image: cgr.dev/chainguard/static:latest
     platforms:
       - linux/amd64
