@@ -62,7 +62,7 @@ kos:
       - linux/amd64
       - linux/arm64
     tags:
-      - "{{ .Version }}"
+      - "v{{ .Version }}"
       - latest
     bare: true
     preserve_import_paths: false
