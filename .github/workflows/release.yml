@@ -3,7 +3,7 @@ name: Release Binary & OCI
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'  # vX.Y.Z format
+      - "v*"
 
 permissions:
   contents: write        # Pour créer la release
@@ -44,13 +44,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Attest build provenance (all artifacts)
-        uses: actions/attest-build-provenance@v2
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: |
-            dist/awesomecli_*_linux_amd64.tar.gz
-            dist/awesomecli_*_linux_arm64.tar.gz
-            dist/awesomecli_*_darwin_amd64.tar.gz
-            dist/awesomecli_*_darwin_arm64.tar.gz
-            dist/awesomecli_*_windows_amd64.zip
-            dist/awesomecli_*_windows_arm64.zip
+            dist/checksums.txt
+            dist/digests.txt
+            # dist/awesomecli_*_linux_amd64.tar.gz
+            # dist/awesomecli_*_linux_arm64.tar.gz
+            # dist/awesomecli_*_darwin_amd64.tar.gz
+            # dist/awesomecli_*_darwin_arm64.tar.gz
+            # dist/awesomecli_*_windows_amd64.zip
+            # dist/awesomecli_*_windows_arm64.zip

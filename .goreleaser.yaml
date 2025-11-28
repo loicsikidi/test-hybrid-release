@@ -38,6 +38,9 @@ checksum:
   name_template: "checksums.txt"
   algorithm: sha256
 
+docker_digest:
+  name_template: "digests.txt"
+
 # Signature Cosign v3 keyless
 signs:
   - id: cosign-checksum
@@ -108,16 +111,20 @@ release:
     gh attestation verify awesomecli_{{ .Version }}_linux_amd64.tar.gz --owner loicsikidi
     ```
 
-    #### Cosign v3
+    #### Cosign
+
+    > [!TIP]
+    > Make sure to you have Cosign **v3** installed!
+
     ```bash
     cosign verify-blob \
       --bundle checksums.txt.sigstore.json \
-      --certificate-identity-regexp 'https://github.com/loicsikidi/test-hybrid-release/.*' \
+      --certificate-identity-regexp 'https://github.com/loicsikidi/test-hybrid-release/{{ .Tag }}' \
       --certificate-oidc-issuer https://token.actions.githubusercontent.com \
       checksums.txt
     ```
   footer: |
-    **Full Changelog**: https://github.com/loicsikidi/test-hybrid-release/compare/{{ .PreviousTag }}...{{ .Tag }}
+    **Generated with GoReleaser 🚀**
 
 # Changelog automatique
 changelog:

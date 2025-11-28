@@ -38,11 +38,15 @@ release:
     gh attestation verify tpm-ca-certificates.pem --owner loicsikidi
     ```
 
-    #### Option 2: Cosign v3
+    #### Option 2: Cosign
+
+    > [!TIP]
+    > Make sure to you have Cosign **v3** installed!
+  
     ```bash
     cosign verify-blob \
       --bundle checksums.txt.sigstore.json \
-      --certificate-identity-regexp 'https://github.com/loicsikidi/test-hybrid-release/.*' \
+      --certificate-identity-regexp 'https://github.com/loicsikidi/test-hybrid-release/{{ .Tag }}' \
       --certificate-oidc-issuer https://token.actions.githubusercontent.com \
       checksums.txt
     ```
@@ -56,7 +60,7 @@ release:
     sha256sum tpm-ca-certificates.pem  # Compare with checksums.txt
     ```
   footer: |
-    **Generated with GoReleaser**
+    **Generated with GoReleaser 🚀**
 
 # Changelog
 changelog:
