@@ -1,0 +1,20 @@
+# Binaries
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Generated bundle
+tpm-ca-certificates.pem
+
+# Go workspace file
+go.work
+go.work.sum
