@@ -1,0 +1,130 @@
+version: 2
+
+project_name: test-hybrid-release
+
+# Build du binaire awesomecli pour plusieurs plateformes
+builds:
+  - id: awesomecli
+    main: ./cmd/main.go
+    binary: awesomecli
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+# Archives des binaires awesomecli
+archives:
+  - id: awesomecli-archives
+    builds:
+      - awesomecli
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    name_template: "awesomecli_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+# Checksum de tous les artifacts
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+# Signature Cosign v3 keyless
+signs:
+  - id: cosign-checksum
+    cmd: cosign
+    signature: "${artifact}.sigstore.json"
+    args:
+      - "sign-blob"
+      - "--bundle=${signature}"
+      - "${artifact}"
+      - "--yes"
+    artifacts: checksum
+
+# Configuration ko pour OCI images
+kos:
+  - id: awesomecli
+    build: awesomecli
+    base_image: cgr.dev/chainguard/static:latest
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    tags:
+      - "{{ .Version }}"
+      - latest
+    bare: true
+    preserve_import_paths: false
+    base_import_paths: false
+    repository: ghcr.io/loicsikidi/test-hybrid-release
+    labels:
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.source: "https://github.com/loicsikidi/test-hybrid-release"
+
+# Configuration de la release GitHub
+release:
+  github:
+    owner: loicsikidi
+    name: test-hybrid-release
+  draft: false
+  prerelease: auto
+  mode: append
+  header: |
+    ## {{ .ProjectName }} {{ .Tag }}
+
+    ### What's Changed
+
+    This release contains the `awesomecli` binary and OCI images built from commit `{{ .FullCommit }}`.
+
+    ### Artifacts
+
+    - **`awesomecli_*`** - CLI binaries for various platforms
+    - **`checksums.txt`** - SHA-256 checksums of all artifacts
+    - **`checksums.txt.sigstore.json`** - Cosign v3 signature bundle
+
+    ### OCI Images
+
+    ```bash
+    docker pull ghcr.io/loicsikidi/{{ .ProjectName }}:{{ .Version }}
+    docker pull ghcr.io/loicsikidi/{{ .ProjectName }}:latest
+    ```
+
+    ### Verification
+
+    #### GitHub CLI
+    ```bash
+    gh attestation verify awesomecli_{{ .Version }}_linux_amd64.tar.gz --owner loicsikidi
+    ```
+
+    #### Cosign v3
+    ```bash
+    cosign verify-blob \
+      --bundle checksums.txt.sigstore.json \
+      --certificate-identity-regexp 'https://github.com/loicsikidi/test-hybrid-release/.*' \
+      --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+      checksums.txt
+    ```
+  footer: |
+    **Full Changelog**: https://github.com/loicsikidi/test-hybrid-release/compare/{{ .PreviousTag }}...{{ .Tag }}
+
+# Changelog automatique
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - 'typo'

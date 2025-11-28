@@ -1,0 +1,92 @@
+version: 2
+
+project_name: test-hybrid-release
+
+# Pas de build pour le bundle-only release
+builds:
+  - skip: true
+
+# Le bundle TPM comme artifact
+archives:
+  - id: bundle
+    format: binary
+    builds: []
+    files:
+      - tpm-ca-certificates.pem
+    name_template: "tpm-ca-certificates"
+
+# Checksum de l'artifact
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+# Signature Cosign v3 keyless
+signs:
+  - id: cosign-checksum
+    cmd: cosign
+    signature: "${artifact}.sigstore.json"
+    args:
+      - "sign-blob"
+      - "--bundle=${signature}"
+      - "${artifact}"
+      - "--yes"
+    artifacts: checksum
+
+# Configuration de la release GitHub
+release:
+  github:
+    owner: loicsikidi
+    name: test-hybrid-release
+  draft: false
+  prerelease: false
+  mode: append
+  header: |
+    ## TPM Trust Bundle {{ .Tag }}
+
+    ### What's Changed
+
+    This release contains the TPM Trust Bundle generated at commit `{{ .FullCommit }}`.
+
+    ### Artifacts
+
+    - **`tpm-ca-certificates.pem`** - The TPM trust bundle
+    - **`checksums.txt`** - SHA-256 checksum
+    - **`checksums.txt.sigstore.json`** - Cosign v3 signature bundle
+
+    ### Verification
+
+    #### Option 1: GitHub CLI (simplest)
+    ```bash
+    gh attestation verify tpm-ca-certificates.pem --owner loicsikidi
+    ```
+
+    #### Option 2: Cosign v3
+    ```bash
+    cosign verify-blob \
+      --bundle checksums.txt.sigstore.json \
+      --certificate-identity-regexp 'https://github.com/loicsikidi/test-hybrid-release/.*' \
+      --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+      checksums.txt
+    ```
+
+    #### Option 3: Reproducibility
+    ```bash
+    git clone https://github.com/loicsikidi/test-hybrid-release
+    cd test-hybrid-release
+    git checkout {{ .Tag }}
+    go run ./cmd/main.go generate
+    sha256sum tpm-ca-certificates.pem  # Compare with checksums.txt
+    ```
+  footer: |
+    **Generated with GoReleaser**
+
+# Changelog
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - 'typo'

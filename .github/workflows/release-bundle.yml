@@ -1,0 +1,75 @@
+name: Release Trust Bundle
+
+on:
+  push:
+    tags:
+      - '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'  # YYYY-MM-DD format
+
+permissions:
+  contents: write        # Pour créer la release
+  id-token: write        # Pour Cosign keyless (OIDC)
+  attestations: write    # Pour GitHub attestations
+  packages: read         # Pour lire les packages
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Nécessaire pour GoReleaser changelog
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v3.0.0'
+
+      - name: Generate TPM trust bundle
+        run: |
+          go run ./cmd/main.go generate
+
+          # Vérifier que le bundle a été généré
+          test -f tpm-ca-certificates.pem || exit 1
+
+          # Afficher des stats pour les logs
+          echo "Bundle size: $(wc -c < tpm-ca-certificates.pem) bytes"
+          ls -lh tpm-ca-certificates.pem
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --clean --config .goreleaser-bundle.yaml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Attest build provenance (trust bundle)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: tpm-ca-certificates.pem
+
+      - name: Generate metadata file
+        run: |
+          cat > metadata.json <<EOF
+          {
+            "version": "${{ github.ref_name }}",
+            "commit": "${{ github.sha }}",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "bundle_sha256": "$(sha256sum tpm-ca-certificates.pem | cut -d' ' -f1)"
+          }
+          EOF
+
+          cat metadata.json  # Afficher pour les logs
+
+      - name: Upload metadata to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: metadata.json
+          tag_name: ${{ github.ref_name }}
