@@ -63,22 +63,3 @@ jobs:
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: tpm-ca-certificates.pem
-
-      - name: Generate metadata file
-        run: |
-          cat > metadata.json <<EOF
-          {
-            "version": "${{ github.ref_name }}",
-            "commit": "${{ github.sha }}",
-            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "bundle_sha256": "$(sha256sum tpm-ca-certificates.pem | cut -d' ' -f1)"
-          }
-          EOF
-
-          cat metadata.json  # Afficher pour les logs
-
-      - name: Upload metadata to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: metadata.json
-          tag_name: ${{ github.ref_name }}

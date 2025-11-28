@@ -54,25 +54,3 @@ jobs:
             dist/awesomecli_*_darwin_arm64.tar.gz
             dist/awesomecli_*_windows_amd64.zip
             dist/awesomecli_*_windows_arm64.zip
-
-      - name: Generate metadata file
-        run: |
-          cat > metadata.json <<EOF
-          {
-            "version": "${{ github.ref_name }}",
-            "commit": "${{ github.sha }}",
-            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "oci_images": [
-              "ghcr.io/loicsikidi/test-hybrid-release:${{ github.ref_name }}",
-              "ghcr.io/loicsikidi/test-hybrid-release:latest"
-            ]
-          }
-          EOF
-
-          cat metadata.json  # Afficher pour les logs
-
-      - name: Upload metadata to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: metadata.json
-          tag_name: ${{ github.ref_name }}
