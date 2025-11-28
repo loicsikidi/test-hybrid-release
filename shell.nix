@@ -1,8 +1,8 @@
-{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/4284c2b73c8bce4b46a6adf23e16d9e2ec8da4bb.tar.gz") {} }:
+{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/ee09932cedcef15aaf476f9343d1dea2cb77e261.tar.gz") {} }:
 
 pkgs.mkShell {
   buildInputs = with pkgs; [
-    go_1_23
+    go
     goreleaser
     cosign
   ];
