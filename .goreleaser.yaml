@@ -25,12 +25,12 @@ builds:
 # Archives des binaires awesomecli
 archives:
   - id: awesomecli-archives
-    builds:
+    ids:
       - awesomecli
-    format: tar.gz
+    formats: [ 'tar.gz' ]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [ 'zip' ]
     name_template: "awesomecli_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
 # Checksum de tous les artifacts
@@ -64,7 +64,8 @@ kos:
     bare: true
     preserve_import_paths: false
     base_import_paths: false
-    repository: ghcr.io/loicsikidi/test-hybrid-release
+    repositories: 
+      - ghcr.io/loicsikidi/test-hybrid-release
     labels:
       org.opencontainers.image.created: "{{ .Date }}"
       org.opencontainers.image.title: "{{ .ProjectName }}"
