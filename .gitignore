@@ -14,6 +14,8 @@ dist/
 
 # Generated bundle
 tpm-ca-certificates.pem
+checksums.txt
+checksums.txt.sigstore.json
 
 # Go workspace file
 go.work
