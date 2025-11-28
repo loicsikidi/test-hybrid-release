@@ -28,7 +28,7 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3
         with:
-          cosign-release: 'v3.0.0'
+          cosign-release: 'v3.8.4'
 
       - name: Generate TPM trust bundle
         run: |
