@@ -35,7 +35,7 @@ jobs:
         with:
           run: |
             # Generate the TPM trust bundle
-            go run ./cmd/main.go generate
+            go run ./cmd generate --output tpm-ca-certificates.pem
 
             # Verify that the bundle was generated
             test -f tpm-ca-certificates.pem || exit 1
