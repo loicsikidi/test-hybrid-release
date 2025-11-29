@@ -11,10 +11,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # create the release
+      contents: write        # publish release
       id-token: write        # required for Cosign keyless (OIDC)
-      attestations: write    # upload attestations
-      # packages: read         # Pour lire les packages
+      attestations: write    # publish attestations
+      packages: write        # publish oci images
     steps:
       - name: Checkout repository
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
