@@ -21,3 +21,9 @@ checksums.txt.sigstore.json
 go.work
 go.work.sum
 default.nix
+
+# Nix build result
+result
+
+# Project documentation
+GOAL.md
