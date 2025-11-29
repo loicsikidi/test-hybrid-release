@@ -31,27 +31,25 @@ jobs:
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
 
       - name: Generate TPM trust bundle and sign checksum
-        uses: geomys/sandboxed-step@7d75eb49d17fdeeb3656b3a57d35932d205bcfb9 # v1.2.1
-        with:
-          run: |
-            # Generate the TPM trust bundle
-            go run ./cmd generate --output tpm-ca-certificates.pem
+        run: |
+          # Generate the TPM trust bundle
+          go run ./cmd generate --output tpm-ca-certificates.pem
 
-            # Verify that the bundle was generated
-            test -f tpm-ca-certificates.pem || exit 1
+          # Verify that the bundle was generated
+          test -f tpm-ca-certificates.pem || exit 1
 
-            # Generate the checksum
-            sha256sum tpm-ca-certificates.pem > checksums.txt
+          # Generate the checksum
+          sha256sum tpm-ca-certificates.pem > checksums.txt
 
-            # Display stats for the logs
-            echo "Bundle size: $(wc -c < tpm-ca-certificates.pem) bytes"
-            cat checksums.txt
+          # Display stats for the logs
+          echo "Bundle size: $(wc -c < tpm-ca-certificates.pem) bytes"
+          cat checksums.txt
 
-            ## Sign the checksum with Cosign
-            cosign sign-blob \
-              --bundle checksums.txt.sigstore.json \
-              --yes \
-              checksums.txt
+          ## Sign the checksum with Cosign
+          cosign sign-blob \
+            --bundle checksums.txt.sigstore.json \
+            --yes \
+            checksums.txt
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
