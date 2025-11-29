@@ -5,6 +5,7 @@ pkgs.mkShell {
     go
     goreleaser
     cosign
+    syft
   ];
 
   shellHook = ''

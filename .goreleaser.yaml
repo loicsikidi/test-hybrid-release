@@ -41,6 +41,11 @@ checksum:
 docker_digest:
   name_template: "digests.txt"
 
+sboms:
+  - artifacts: archive
+  - id: source # Two different sbom configurations need two different IDs
+    artifacts: source
+
 # Signature Cosign v3 keyless
 signs:
   - id: cosign-checksum
@@ -54,27 +59,69 @@ signs:
     artifacts: checksum
 
 # Configuration ko pour OCI images
-kos:
-  - id: awesomecli
-    main: ./cmd
-    base_image: cgr.dev/chainguard/static:latest
-    platforms:
-      - linux/amd64
-      - linux/arm64
-    tags:
-      - "v{{ .Version }}"
-      - latest
-    bare: true
-    preserve_import_paths: false
-    base_import_paths: false
-    repositories: 
-      - ghcr.io/loicsikidi/test-hybrid-release
-    labels:
-      org.opencontainers.image.created: "{{ .Date }}"
-      org.opencontainers.image.title: "{{ .ProjectName }}"
-      org.opencontainers.image.revision: "{{ .FullCommit }}"
-      org.opencontainers.image.version: "{{ .Version }}"
-      org.opencontainers.image.source: "https://github.com/loicsikidi/test-hybrid-release"
+# kos:
+#   - id: awesomecli
+#     main: ./cmd
+#     base_image: cgr.dev/chainguard/static:latest
+#     platforms:
+#       - linux/amd64
+#       - linux/arm64
+#     tags:
+#       - "v{{ .Version }}"
+#       - latest
+#     bare: true
+#     preserve_import_paths: false
+#     base_import_paths: false
+#     repositories:
+#       - ghcr.io/loicsikidi/test-hybrid-release
+#     labels:
+#       org.opencontainers.image.created: "{{ .Date }}"
+#       org.opencontainers.image.title: "{{ .ProjectName }}"
+#       org.opencontainers.image.revision: "{{ .FullCommit }}"
+#       org.opencontainers.image.version: "{{ .Version }}"
+#       org.opencontainers.image.source: "https://github.com/loicsikidi/test-hybrid-release"
+
+# Configuration Docker pour OCI images
+dockers:
+  - image_templates:
+      - "ghcr.io/loicsikidi/test-hybrid-release:v{{ .Version }}-amd64"
+      - "ghcr.io/loicsikidi/test-hybrid-release:latest-amd64"
+    use: buildx
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.source=https://github.com/loicsikidi/test-hybrid-release"
+    extra_files:
+      - cmd/
+  - image_templates:
+      - "ghcr.io/loicsikidi/test-hybrid-release:v{{ .Version }}-arm64"
+      - "ghcr.io/loicsikidi/test-hybrid-release:latest-arm64"
+    use: buildx
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.source=https://github.com/loicsikidi/test-hybrid-release"
+    goarch: arm64
+    extra_files:
+      - cmd/
+
+docker_manifests:
+  - name_template: "ghcr.io/loicsikidi/test-hybrid-release:v{{ .Version }}"
+    image_templates:
+      - "ghcr.io/loicsikidi/test-hybrid-release:v{{ .Version }}-amd64"
+      - "ghcr.io/loicsikidi/test-hybrid-release:v{{ .Version }}-arm64"
+  - name_template: "ghcr.io/loicsikidi/test-hybrid-release:latest"
+    image_templates:
+      - "ghcr.io/loicsikidi/test-hybrid-release:latest-amd64"
+      - "ghcr.io/loicsikidi/test-hybrid-release:latest-arm64"
 
 # Configuration de la release GitHub
 release:
