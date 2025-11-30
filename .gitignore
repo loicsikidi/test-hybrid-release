@@ -12,7 +12,7 @@ dist/
 # Output of the go coverage tool
 *.out
 
-# Generated bundle
+# Generated attefacts
 tpm-ca-certificates.pem
 checksums.txt
 checksums.txt.sigstore.json
@@ -27,3 +27,6 @@ result
 
 # Project documentation
 GOAL.md
+
+# pre-commit files
+.pre-commit-config.yaml
