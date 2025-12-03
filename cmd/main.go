@@ -15,6 +15,7 @@ import (
 	"go.step.sm/crypto/pemutil"
 )
 
+// awesomecli is a CLI tool to generate fake PEM bundles
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: awesomecli [version|generate]")
