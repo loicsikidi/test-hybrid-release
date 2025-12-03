@@ -61,7 +61,7 @@ jobs:
         with:
           subject-checksums: dist/checksums.txt
 
-      # - name: Attest digests.txt provenance
-      #   uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
-      #   with:
-      #     subject-checksums: dist/digests.txt
+      - name: Attest digests.txt provenance
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
+        with:
+          subject-checksums: dist/digests.txt
