@@ -13,9 +13,7 @@ dist/
 *.out
 
 # Generated attefacts
-tpm-ca-certificates.pem
-checksums.txt
-checksums.txt.sigstore.json
+output/
 
 # Go workspace file
 go.work

@@ -15,9 +15,9 @@ release:
   prerelease: false
   mode: append
   extra_files:
-    - glob: ./tpm-ca-certificates.pem
-    - glob: ./checksums.txt
-    - glob: ./checksums.txt.sigstore.json
+    - glob: ./output/tpm-ca-certificates.pem
+    - glob: ./output/checksums.txt
+    - glob: ./output/checksums.txt.sigstore.json
   header: |
     ## TPM Trust Bundle {{ .Tag }}
 

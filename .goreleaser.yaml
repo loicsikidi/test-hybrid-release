@@ -154,12 +154,12 @@ release:
     > *Note: in addition, keyless signature allows to know the identity bound the emphemeral key (a tag in our case).*
 
     > [!TIP]
-    > Make sure to you have Cosign **v3** installed!
+    > Make sure to use **`cosign >= v2.4.3`** in order to support [sigstore bundle format](https://docs.sigstore.dev/about/bundle/).
 
     ```bash
     cosign verify-blob \
       --bundle checksums.txt.sigstore.json \
-      --certificate-identity-regexp 'https://github.com/loicsikidi//{{ .ProjectName }}/{{ .Tag }}' \
+      --certificate-identity-regexp 'https://github.com/loicsikidi/{{ .ProjectName }}/{{ .Tag }}' \
       --certificate-oidc-issuer https://token.actions.githubusercontent.com \
       checksums.txt
 
